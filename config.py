@@ -15,8 +15,11 @@ class config:
                 break
             
             formatted_data = [0 for x in range(self.features + 1)]
-            formatted_data[0] = float(splitted[0]) - self.shift
-
+            if float(splitted[0]) - self.shift >= 0:
+                formatted_data[0] = 1
+            else:
+               formatted_data[0] = -1
+               
             counter = 1
             for i in range(1, self.features + 1):
         
@@ -32,4 +35,8 @@ class config:
 
             tmp_data.append(formatted_data)
     return tmp_data
+  
+  def show_data(self):
+    for line in self.data:
+       print(line)
 

@@ -9,7 +9,6 @@ class LinearClassification:
 
         self.y = data[:, 0]
         self.x = data[:, 1:]
-
         self.y_private = private_data[:, 0]
         self.x_private = private_data[:, 1:]
         
@@ -37,28 +36,28 @@ class LinearClassification:
         self.cost_list = []
 
     def find_gradient(self):
-    #    d_theta = 1 / (self.m + self.m_private) * (self.x.T.dot(self.y_pred - self.y) +
-    #                                                self.x_private.T.dot(self.y_pred_private - self.y_private))
         d_theta_1 = np.zeros(self.features)
         d_theta_2 = np.zeros(self.features)
 
         for i in range(self.y.size):
-            d_theta_1 += - self.x[i] / (1 + np.e ** (self.x[i].dot(self.theta)))
+            d_theta_1 += - self.y[i] * self.x[i] / (1 + np.e ** (self.y[i] * self.x[i].dot(self.theta)))
 
         for i in range(self.y_private.size):
-            d_theta_2 += self.x_private[i] / (1 + np.e ** (self.x_private[i].dot(self.theta)))
+            d_theta_2 += - self.y_private[i] * self.x_private[i] / (1 + np.e ** (self.y_private[i] * self.x_private[i].dot(self.theta)))
 
-        d_theta = d_theta_1 + d_theta_2
 
-        return d_theta
+        return d_theta_1, d_theta_2
 
 
     def update_theta(self,learning_rate_1, learning_rate_2, momentum):
-        d_theta = self.find_gradient()
-        d_theta = d_theta.reshape(self.features, 1)
+        d_theta_1, d_theta_2 = self.find_gradient()
+        # print(d_theta_1)
+        d_theta_1 = d_theta_1.reshape(self.features, 1)
+        d_theta_2 = d_theta_2.reshape(self.features, 1)
 
-        self.ordinary_steps.append(self.theta - learning_rate_1 * d_theta)
-        self.aggressive_steps.append(np.array(self.aggressive_steps[-1]) - learning_rate_2 * d_theta)
+
+        self.ordinary_steps.append(self.theta - learning_rate_1 * d_theta_1)
+        self.aggressive_steps.append(np.array(self.aggressive_steps[-1]) - learning_rate_2 * d_theta_2)
 
         self.theta = momentum * self.aggressive_steps[-1] + (1 - momentum) * self.ordinary_steps[-1]
         
@@ -69,10 +68,10 @@ class LinearClassification:
         cost = 0
     
         for i in range(self.y.size):
-            cost += np.log(1 / (1 + np.e ** (- (self.x[i].dot(self.theta)))))
+            cost += np.log(1 / (1 + np.e ** (- self.y[i] * (self.x[i].dot(self.theta)))))
 
         for i in range(self.y_private.size):
-            cost += np.log(1 / (1 + np.e ** ((self.x_private[i].dot(self.theta)))))
+            cost += np.log(1 / (1 + np.e ** (- self.y_private[i] * (self.x_private[i].dot(self.theta)))))
 
         cost /= self.norm_constant
 
@@ -80,7 +79,7 @@ class LinearClassification:
         return cost
     
 
-    def get_current_accuracy(self, data, probability):
+    def get_current_accuracy(self, data : np.ndarray):
         characteristic_amount = 0
 
         old_thetas = np.array(self.old_thetas)
@@ -93,8 +92,9 @@ class LinearClassification:
             line = np.insert(line[1:], 0, 1)
             value_func = line.dot(theta)
             value_func = np.sign(value_func)
+
+            print("true = %d, pred = %g" % (true_val, value_func))
             
-            # print("true = %d, pred = %d" % (line[0], value_func))
 
             characteristic_amount += (value_func == true_val)
 

@@ -29,24 +29,18 @@ class LinearClassification:
 
         self.ordinary_steps = [np.zeros((features, 1))]
         self.aggressive_steps = [np.zeros((features, 1))]
-
-        self.y_pred = 0
-        self.y_pred_private = 0
-
+        
         self.cost_list = []
 
     def find_gradient(self):
-        d_theta_1 = np.zeros(self.features)
-        d_theta_2 = np.zeros(self.features)
+        tmp_val = np.dot(self.x, self.theta)
+        d_theta_1 = -np.sum(self.y * self.x / (1 + np.exp(self.y * tmp_val)), axis=0)
 
-        for i in range(self.y.size):
-            d_theta_1 += - self.y[i] * self.x[i] / (1 + np.e ** (self.y[i] * self.x[i].dot(self.theta)))
-
-        for i in range(self.y_private.size):
-            d_theta_2 += - self.y_private[i] * self.x_private[i] / (1 + np.e ** (self.y_private[i] * self.x_private[i].dot(self.theta)))
-
+        tmp_val_private = np.dot(self.x_private, self.theta)
+        d_theta_2 = -np.sum(self.y_private * self.x_private / (1 + np.exp(self.y_private * tmp_val_private)), axis=0)
 
         return d_theta_1, d_theta_2
+
 
 
     def update_theta(self,learning_rate_1, learning_rate_2, momentum):
@@ -66,12 +60,12 @@ class LinearClassification:
 
     def compute_cost(self):
         cost = 0
-    
-        for i in range(self.y.size):
-            cost += np.log(1 / (1 + np.e ** (- self.y[i] * (self.x[i].dot(self.theta)))))
 
-        for i in range(self.y_private.size):
-            cost += np.log(1 / (1 + np.e ** (- self.y_private[i] * (self.x_private[i].dot(self.theta)))))
+        tmp_val = self.x.dot(self.theta)
+        cost += np.sum(np.log(1 / (1 + np.exp(-self.y * tmp_val))))
+
+        tmp_val_private = self.x_private.dot(self.theta)
+        cost += np.sum(np.log(1 / (1 + np.exp(-self.y_private * tmp_val_private))))
 
         cost /= self.norm_constant
 
@@ -79,13 +73,13 @@ class LinearClassification:
         return cost
     
 
-    def get_current_accuracy(self, data : np.ndarray):
+    def get_current_accuracy(self, data : np.ndarray, graph_flag):
         characteristic_amount = 0
 
         old_thetas = np.array(self.old_thetas)
         theta = 1 / len(old_thetas) * np.sum(old_thetas, axis=0)
 
-        print("theta = ", theta)
+        # print("theta = ", theta)
         
         for line in data:
             true_val = line[0]
@@ -93,20 +87,52 @@ class LinearClassification:
             value_func = line.dot(theta)
             value_func = np.sign(value_func)
 
-            print("true = %d, pred = %g" % (true_val, value_func))
+            # print("true = %d, pred = %g" % (true_val, value_func))
             
 
             characteristic_amount += (value_func == true_val)
 
         accuracy = characteristic_amount / data.shape[0]
 
-        rng = [x for x in range(len(self.cost_list))]
-        plt.plot(self.cost_list, rng)
-        plt.plot(0,0)
-        plt.grid()
-        plt.show()
+        if graph_flag:
+            rng = [x for x in range(len(self.cost_list))]
+            plt.plot(self.cost_list, rng)
+            plt.plot(0,0)
+            plt.grid()
+            plt.show()
 
         return accuracy
+
+    def get_precision_recall(self, data):
+        tp = 0
+        tn = 0
+        fn = 0
+        fp = 0
+
+        old_thetas = np.array(self.old_thetas)
+        theta = 1 / len(old_thetas) * np.sum(old_thetas, axis=0)
+
+        for line in data:
+            actual_class = line[0]
+            line = np.insert(line[1:], 0, 1)
+            pred_class = line.dot(theta)
+            pred_class = np.sign(pred_class)
+            
+            if actual_class == 1 and pred_class == 1:
+                tp += 1
+            elif actual_class == 1 and pred_class == -1:
+                fn += 1
+            elif actual_class == -1 and pred_class == 1:
+                fp += 1
+            elif actual_class == -1 and pred_class == -1:
+                tn += 1
+            
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
+        F_score = 2 * precision * recall / (precision + recall)
+
+        return precision, recall, F_score
+
     
 
     def show_graphs(self, momentum):

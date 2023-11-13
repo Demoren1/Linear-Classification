@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 
 class LinearClassification:
     def __init__(self, data : np.ndarray, private_data : np.ndarray, features):
@@ -40,18 +39,16 @@ class LinearClassification:
         d_theta_2 = -np.sum(self.y_private * self.x_private / (1 + np.exp(self.y_private * tmp_val_private)), axis=0)
 
         return d_theta_1, d_theta_2
-
-
+    
 
     def update_theta(self,learning_rate_1, learning_rate_2, momentum):
         d_theta_1, d_theta_2 = self.find_gradient()
-        # print(d_theta_1)
         d_theta_1 = d_theta_1.reshape(self.features, 1)
         d_theta_2 = d_theta_2.reshape(self.features, 1)
 
 
         self.ordinary_steps.append(self.theta - learning_rate_1 * d_theta_1)
-        self.aggressive_steps.append(np.array(self.aggressive_steps[-1]) - learning_rate_2 * d_theta_2)
+        self.aggressive_steps.append(np.array(self.aggressive_steps[-1] - learning_rate_2 * d_theta_2))
 
         self.theta = momentum * self.aggressive_steps[-1] + (1 - momentum) * self.ordinary_steps[-1]
         
@@ -82,15 +79,13 @@ class LinearClassification:
         # print("theta = ", theta)
         
         for line in data:
-            true_val = line[0]
+            actual_class = line[0]
             line = np.insert(line[1:], 0, 1)
-            value_func = line.dot(theta)
-            value_func = np.sign(value_func)
+            pred_class = line.dot(theta)
+            # print("true = %d, pred = %g" % (actual_class, pred_class))
+            pred_class = np.sign(pred_class)
 
-            # print("true = %d, pred = %g" % (true_val, value_func))
-            
-
-            characteristic_amount += (value_func == true_val)
+            characteristic_amount += (pred_class == actual_class)
 
         accuracy = characteristic_amount / data.shape[0]
 
@@ -126,7 +121,7 @@ class LinearClassification:
                 fp += 1
             elif actual_class == -1 and pred_class == -1:
                 tn += 1
-            
+
         precision = tp / (tp + fp)
         recall = tp / (tp + fn)
         F_score = 2 * precision * recall / (precision + recall)

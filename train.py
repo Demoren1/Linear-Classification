@@ -8,10 +8,10 @@ def main():
 
   test_file = "datasets/mushrooms_test.svm"
 
-  iteration = 1000
+  iteration = 0
   learning_rate_1 = 0.0001
   learning_rate_2 = 0.0001
-  momentum = 0.5
+  # momentum = 0.5
 
   features = 113
   shift = 2
@@ -28,22 +28,23 @@ def main():
 
   test_data = np.array(test_conf.data)
  
-  model = linear_classification.LinearClassification(data1, data2, features)
   
-  # for momentum in range(0, 10):
-  #   momentum /= 10
-  #   print("momentum is", momentum)
+  for momentum in range(0, 11):
+    model = linear_classification.LinearClassification(data1, data2, features)
+    momentum /= 10
+    print("momentum is", momentum)
 
-  train_model(model, iteration, learning_rate_1, learning_rate_2, momentum, test_data)
-  print("accuracy is ", model.get_current_accuracy(test_data, 1))
-  print("precision is %g\nrecall is %g\nF1 is %g" % model.get_precision_recall(test_data))
+    train_model(model, iteration, learning_rate_1, learning_rate_2, momentum, test_data)
+    print("accuracy is ", model.get_current_accuracy(test_data, 1))
+    print("precision is %g\nrecall is %g\nF1 is %g" % model.get_precision_recall(test_data))
 
 
-def train_model(model, iteration, learning_rate_1, learning_rate_2, momentum, test_data):
+def train_model(model : linear_classification.LinearClassification, iteration, learning_rate_1, learning_rate_2, momentum, test_data):
   for i in range(iteration):
-      if i % 10000 == 0 and i != 0:
-        print(i)
-        print("accuracy is ", model.get_current_accuracy(test_data, 0))
+      # if i % 2 == 0 and i != 0:
+      #   print(i)
+      #   print("accuracy is ", model.get_current_accuracy(test_data, 0))
+      #   print("precision is %g\nrecall is %g\nF1 is %g" % model.get_precision_recall(test_data))
          
       model.update_theta(learning_rate_1, learning_rate_2, momentum)
       model.compute_cost()

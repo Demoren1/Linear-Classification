@@ -70,7 +70,7 @@ class LinearClassification:
         return cost
     
 
-    def get_current_accuracy(self, data : np.ndarray, graph_flag):
+    def get_current_accuracy(self, data : np.ndarray, graph_flag, save_path = "accuracy_graph.png"):
         characteristic_amount = 0
 
         old_thetas = np.array(self.old_thetas)
@@ -82,8 +82,8 @@ class LinearClassification:
             actual_class = line[0]
             line = np.insert(line[1:], 0, 1)
             pred_class = line.dot(theta)
-            # print("true = %d, pred = %g" % (actual_class, pred_class))
             pred_class = np.sign(pred_class)
+            # print("true = %d, pred = %g" % (actual_class, pred_class))
 
             characteristic_amount += (pred_class == actual_class)
 
@@ -91,10 +91,13 @@ class LinearClassification:
 
         if graph_flag:
             rng = [x for x in range(len(self.cost_list))]
+            plt.rcParams ['figure.figsize'] = [10, 8]
             plt.plot(self.cost_list, rng)
             plt.plot(0,0)
             plt.grid()
-            plt.show()
+            # plt.show()
+            plt.savefig(save_path)
+            plt.clf()
 
         return accuracy
 

@@ -7,23 +7,23 @@ import config as cfg
 
 
 def main():
-  clear_results()
 
-  file1 = "datasets/mushrooms.svm"
-  file2 = "datasets/mushrooms2.svm"
+  file1 = "datasets/mushrooms1_getero.svm"
+  file2 = "datasets/mushrooms2_getero.svm"
 
   test_file = "datasets/mushrooms.svm"
 
-  result_file = open("results/results.txt", "w")
-  result_graph_path = "results/mushrooms_"
+  result_file = open("tmp_results/results.txt", "w")
+  result_graph_path = "tmp_results/mushrooms_getero_"
+  clear_results("tmp_results")
 
   iteration = 5000
   learning_rate_1 = 0.00001
   learning_rate_2 = 0.00001
-  momentum = 0.5
+  momentum = 0.7
 
   features = 112
-  shift = 0
+  shift = 2
 
   file1_conf = cfg.config(file1, features, shift)
   file2_conf = cfg.config(file2, features, shift)
@@ -47,7 +47,7 @@ def main():
   print("gradient norm is %g\n" % model.get_gradient_norm(1, norm_path))
 
   result_file.write("momentum is %g\n" % momentum)
-  # result_file.write("accuracy is %g\n" % model.get_current_accuracy(test_data, 0))
+  result_file.write("accuracy is %g\n" % model.get_current_accuracy(test_data, 0))
   result_file.write("precision is %g\nrecall is %g\nF1 is %g\n" % model.get_precision_recall(test_data))
   result_file.write("gradient norm is %g\n" % model.get_gradient_norm(0))
 
@@ -64,8 +64,8 @@ def train_model(model : linear_classification.LinearClassification, iteration, l
       model.compute_cost()
   return
 
-def clear_results():
-  shutil.rmtree("results")
-  os.makedirs("results")
+def clear_results(delete_path):
+  shutil.rmtree(delete_path)
+  os.makedirs(delete_path)
 
 main()

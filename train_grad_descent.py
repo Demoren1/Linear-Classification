@@ -9,13 +9,13 @@ import config as cfg
 def main():
   clear_results()
 
-  file1 = "datasets/mushrooms2.svm"
-  test_file = "datasets/mushrooms2.svm"
+  file1 = "datasets/mushrooms.svm"
+  test_file = "datasets/mushrooms.svm"
 
-  result_file = open("results/results.txt", "w")
-  result_graph_path = "results/mushrooms_"
+  result_file = open("tmp_results/results.txt", "w")
+  result_graph_path = "tmp_results/mushrooms_"
 
-  iteration = 100000
+  iteration = 5000
   learning_rate_1 = 0.00001
 
   features = 112
@@ -62,7 +62,7 @@ def train_model(model : gradient_descent.GradientDescent, iteration, learning_ra
     return
 
 def clear_results():
-  shutil.rmtree("results")
-  os.makedirs("results")
+  shutil.rmtree("tmp_results")
+  os.makedirs("tmp_results")
 
 main()

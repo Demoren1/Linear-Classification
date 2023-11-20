@@ -21,7 +21,8 @@ class LinearClassification:
         self.ordinary_steps = [np.zeros((features, 1))]
         self.aggressive_steps = [np.zeros((features, 1))]
         self.cost_list = []
-        self.gradients = []
+        self.gradients_norms = []
+
 
     def find_gradient(self):
         tmp_val = np.dot(self.x, self.theta)
@@ -30,21 +31,19 @@ class LinearClassification:
         tmp_val_private = np.dot(self.x_private, self.theta)
         d_theta_2 = -np.sum(self.y_private * self.x_private / (1 + np.exp(self.y_private * tmp_val_private) + 1e-15), axis=0)
 
-        return d_theta_1, d_theta_2
+        return d_theta_1.reshape(self.features, 1), d_theta_2.reshape(self.features, 1)
     
 
     def update_theta(self,learning_rate_1, learning_rate_2, momentum):
         d_theta_1, d_theta_2 = self.find_gradient()
-        d_theta_1 = d_theta_1.reshape(self.features, 1)
-        d_theta_2 = d_theta_2.reshape(self.features, 1)
 
         self.ordinary_steps.append(self.theta - learning_rate_1 * d_theta_1)
-        self.aggressive_steps.append(np.array(self.aggressive_steps[-1] - learning_rate_2 * d_theta_2))
+        self.aggressive_steps.append(self.aggressive_steps[-1] - learning_rate_2 * d_theta_2)
 
         self.theta = momentum * self.aggressive_steps[-1] + (1 - momentum) * self.ordinary_steps[-1]
         
+        self.gradients_norms.append(np.linalg.norm(d_theta_1) + np.linalg.norm(d_theta_2))
         self.old_thetas.append(np.copy(self.theta))
-        self.gradients.append(d_theta_1 + d_theta_2)
 
 
     def compute_cost(self):
@@ -83,11 +82,11 @@ class LinearClassification:
         if graph_flag:
             rng = [x for x in range(len(self.cost_list))]
             plt.rcParams ['figure.figsize'] = [10, 8]
-            plt.plot(self.cost_list, rng)
+            plt.plot(rng, self.cost_list)
             plt.plot(0,0)
             plt.grid()
-            plt.ylabel("Iteration")
-            plt.xlabel("Cost value")
+            plt.xlabel("Iteration")
+            plt.ylabel("Cost value")
             # plt.show()
             plt.savefig(save_path)
             plt.clf()
@@ -134,16 +133,16 @@ class LinearClassification:
 
 
     def get_gradient_norm(self, graph_flag : bool, save_path = "gradient_norm.png"):
-        gradient_norms = np.linalg.norm(self.gradients, axis=1)
+        gradient_norms = [(1 / self.norm_constant) * x for x in  self.gradients_norms]
 
         if graph_flag:
             rng = [x for x in range(len(gradient_norms))]
             plt.rcParams ['figure.figsize'] = [10, 8]
-            plt.plot(gradient_norms, rng)
+            plt.plot(rng, gradient_norms)
             plt.plot(0,0)
             plt.grid()
-            plt.ylabel("Iteration")
-            plt.xlabel("Gradient value")
+            plt.xlabel("Iteration")
+            plt.ylabel("Gradient norm value")
             plt.savefig(save_path)
             plt.clf()
         return gradient_norms[-1]

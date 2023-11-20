@@ -108,7 +108,7 @@ class GradientDescent:
         return precision, recall, F_score
 
     def get_gradient_norm(self, graph_flag : bool, save_path = "gradient_norm.png"):
-        gradient_norms = np.linalg.norm(self.gradients, axis=1)
+        gradient_norms = 1 / self.norm_constant * np.linalg.norm(self.gradients, axis=1)
 
         if graph_flag:
             rng = [x for x in range(len(gradient_norms))]

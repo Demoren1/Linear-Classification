@@ -20,7 +20,7 @@ def main():
   iteration = 5000
   learning_rate_1 = 0.00001
   learning_rate_2 = 0.00001
-  momentum = 0.7
+  momentum = 0.5
 
   features = 112
   shift = 2

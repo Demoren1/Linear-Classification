@@ -134,6 +134,7 @@ class LinearClassification:
 
     def get_gradient_norm(self, graph_flag : bool, save_path = "gradient_norm.png"):
         gradient_norms = [(1 / self.norm_constant) * x for x in  self.gradients_norms]
+        # gradient_norms = self.gradients_norms
 
         if graph_flag:
             rng = [x for x in range(len(gradient_norms))]

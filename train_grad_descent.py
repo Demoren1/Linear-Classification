@@ -9,17 +9,17 @@ import config as cfg
 def main():
   clear_results()
 
-  file1 = "datasets/mushrooms.svm"
+  file1 = "datasets/mushrooms2.svm"
   test_file = "datasets/mushrooms.svm"
 
   result_file = open("tmp_results/results.txt", "w")
-  result_graph_path = "tmp_results/mushrooms_"
-
-  iteration = 5000
-  learning_rate_1 = 0.00001
+  result_graph_path = "tmp_results/mushrooms2_"
 
   features = 112
-  shift = 0
+  shift = 2
+
+  iteration = 10000
+  learning_rate_1 = 0.00001
 
   file1_conf = cfg.config(file1, features, shift)
   test_conf = cfg.config(test_file, features, shift)

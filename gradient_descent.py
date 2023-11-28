@@ -65,13 +65,14 @@ class GradientDescent:
         accuracy = characteristic_amount / data.shape[0]
 
         if graph_flag:
-            rng = [x for x in range(len(self.cost_list))]
+            rng = [np.log(x + 1e-15)  for x in range(1, len(self.cost_list) + 1)]
             plt.rcParams ['figure.figsize'] = [10, 8]
-            plt.plot(self.cost_list, rng)
+            plt.plot(rng, self.cost_list)
             plt.plot(0,0)
             plt.grid()
-            plt.ylabel("Iteration")
-            plt.xlabel("Cost value")
+            plt.xlabel("ln(Iteration)")
+            plt.ylabel("Cost value")
+            plt.title("Cost value(ln(Iteration))")
             # plt.show()
             plt.savefig(save_path)
             plt.clf()
@@ -111,14 +112,14 @@ class GradientDescent:
         gradient_norms = 1 / self.norm_constant * np.linalg.norm(self.gradients, axis=1)
 
         if graph_flag:
-            rng = [x for x in range(len(gradient_norms))]
+            rng = [np.log(x + 1e-15) for x in range(1, len(gradient_norms) + 1)]
             plt.rcParams ['figure.figsize'] = [10, 8]
-            plt.plot(gradient_norms, rng)
+            plt.plot(rng, gradient_norms)
             plt.plot(0,0)
             plt.grid()
-            plt.ylabel("Iteration")
-            plt.xlabel("Gradient value")
-            # plt.show()
+            plt.xlabel("ln(Iteration)")
+            plt.ylabel("Gradient norm value")
+            plt.title("Gradient norm(ln(Iteration))")
             plt.savefig(save_path)
             plt.clf()
         return gradient_norms[-1]

@@ -80,13 +80,14 @@ class LinearClassification:
         accuracy = characteristic_amount / data.shape[0]
 
         if graph_flag:
-            rng = [x for x in range(len(self.cost_list))]
+            rng = [np.log(x + 1e-15)  for x in range(1, len(self.cost_list) + 1)]
             plt.rcParams ['figure.figsize'] = [10, 8]
             plt.plot(rng, self.cost_list)
             plt.plot(0,0)
             plt.grid()
-            plt.xlabel("Iteration")
+            plt.xlabel("ln(Iteration)")
             plt.ylabel("Cost value")
+            plt.title("Cost value(ln(Iteration))")
             # plt.show()
             plt.savefig(save_path)
             plt.clf()
@@ -137,13 +138,14 @@ class LinearClassification:
         # gradient_norms = self.gradients_norms
 
         if graph_flag:
-            rng = [x for x in range(len(gradient_norms))]
+            rng = [np.log(x + 1e-15) for x in range(1, len(gradient_norms) + 1)]
             plt.rcParams ['figure.figsize'] = [10, 8]
             plt.plot(rng, gradient_norms)
             plt.plot(0,0)
             plt.grid()
-            plt.xlabel("Iteration")
+            plt.xlabel("ln(Iteration)")
             plt.ylabel("Gradient norm value")
+            plt.title("Gradient norm(ln(Iteration))")
             plt.savefig(save_path)
             plt.clf()
         return gradient_norms[-1]

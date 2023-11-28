@@ -8,22 +8,23 @@ import config as cfg
 
 def main():
 
-  file1 = "datasets/mushrooms1_getero.svm"
-  file2 = "datasets/mushrooms2_getero.svm"
+  file1 = "datasets/mushrooms1.svm"
+  file2 = "datasets/mushrooms2.svm"
 
   test_file = "datasets/mushrooms.svm"
 
+  features = 112
+  shift = 2
+
   result_file = open("tmp_results/results.txt", "w")
-  result_graph_path = "tmp_results/mushrooms_getero_"
+  result_graph_path = "tmp_results/mushrooms_"
   clear_results("tmp_results")
 
-  iteration = 5000
+  iteration = 100000
   learning_rate_1 = 0.00001
   learning_rate_2 = 0.00001
   momentum = 0.5
 
-  features = 112
-  shift = 2
 
   file1_conf = cfg.config(file1, features, shift)
   file2_conf = cfg.config(file2, features, shift)
@@ -58,7 +59,7 @@ def main():
 
 def train_model(model : linear_classification.LinearClassification, iteration, learning_rate_1, learning_rate_2, momentum, test_data):
   for i in range(iteration):    
-      if i % 100 == 0:
+      if i % 1000 == 0:
          print("Iteration = %d" % i)     
       model.update_theta(learning_rate_1, learning_rate_2, momentum)
       model.compute_cost()

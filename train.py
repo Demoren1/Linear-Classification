@@ -8,23 +8,22 @@ import config as cfg
 
 def main():
 
-  file1 = "datasets/mushrooms1.svm"
-  file2 = "datasets/mushrooms2.svm"
+  file1 = "datasets/a9a2.svm"
+  file2 = "datasets/a9a.svm"
 
-  test_file = "datasets/mushrooms.svm"
+  test_file = "datasets/a9a.svm"
 
-  features = 112
-  shift = 2
+  features = 123
+  shift = 0
 
   result_file = open("tmp_results/results.txt", "w")
-  result_graph_path = "tmp_results/mushrooms_"
+  result_graph_path = "tmp_results/a9a2_"
   clear_results("tmp_results")
 
-  iteration = 100000
-  learning_rate_1 = 0.00001
-  learning_rate_2 = 0.00001
-  momentum = 0.5
-
+  iteration = 1000
+  learning_rate_1 = 0.0001
+  learning_rate_2 = 0.0001
+  momentum = 1
 
   file1_conf = cfg.config(file1, features, shift)
   file2_conf = cfg.config(file2, features, shift)
@@ -37,11 +36,11 @@ def main():
   data2 = np.array(data2)
 
   test_data = np.array(test_conf.data)
-  
+
   accuracy_path = result_graph_path + str(momentum) + "_accuracy.png"
   norm_path = result_graph_path + str(momentum) + "_norm.png"
-  model = linear_classification.LinearClassification(data1, data2, features)
-  train_model(model, iteration, learning_rate_1, learning_rate_2, momentum, test_data)
+  model = linear_classification.LinearClassification(data1, data2, momentum, features)
+  train_model(model, iteration, learning_rate_1, learning_rate_2)
   print("momentum is", momentum)
   print("accuracy is ", model.get_current_accuracy(test_data, 1, accuracy_path))
   print("precision is %g\nrecall is %g\nF1 is %g" % model.get_precision_recall(test_data))
@@ -57,11 +56,11 @@ def main():
   return 0
 
 
-def train_model(model : linear_classification.LinearClassification, iteration, learning_rate_1, learning_rate_2, momentum, test_data):
+def train_model(model : linear_classification.LinearClassification, iteration, learning_rate_1, learning_rate_2):
   for i in range(iteration):    
-      if i % 1000 == 0:
+      if i % 100 == 0:
          print("Iteration = %d" % i)     
-      model.update_theta(learning_rate_1, learning_rate_2, momentum)
+      model.update_theta(learning_rate_1, learning_rate_2)
       model.compute_cost()
   return
 

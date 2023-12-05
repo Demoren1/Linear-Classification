@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class LinearClassification:
-    def __init__(self, data : np.ndarray, private_data : np.ndarray, features):
+    def __init__(self, data : np.ndarray, private_data : np.ndarray, momentum, features):
         features += 1
         self.features = features
 
@@ -15,6 +15,7 @@ class LinearClassification:
         self.y_private = self.y_private.reshape(self.y_private.size, 1)
 
         self.norm_constant = self.y.size + self.y_private.size
+        self.momentum = momentum
 
         self.theta = np.zeros((features, 1))
         self.old_thetas = [np.copy(self.theta)]
@@ -34,7 +35,8 @@ class LinearClassification:
         return d_theta_1.reshape(self.features, 1), d_theta_2.reshape(self.features, 1)
     
 
-    def update_theta(self,learning_rate_1, learning_rate_2, momentum):
+    def update_theta(self,learning_rate_1, learning_rate_2):
+        momentum = self.momentum
         d_theta_1, d_theta_2 = self.find_gradient()
 
         self.ordinary_steps.append(self.theta - learning_rate_1 * d_theta_1)
@@ -42,20 +44,19 @@ class LinearClassification:
 
         self.theta = momentum * self.aggressive_steps[-1] + (1 - momentum) * self.ordinary_steps[-1]
         
-        self.gradients_norms.append(np.linalg.norm(d_theta_1) + np.linalg.norm(d_theta_2))
+        self.gradients_norms.append(np.linalg.norm(d_theta_1) * (1 - momentum) + np.linalg.norm(d_theta_2) * momentum)
         self.old_thetas.append(np.copy(self.theta))
 
 
     def compute_cost(self):
         cost = 0
+        momentum = self.momentum
 
         tmp_val = self.x.dot(self.theta)
-        cost += np.sum(np.logaddexp(0, -self.y * tmp_val))
-        # cost += np.sum(np.log(1 + np.exp(-self.y * tmp_val)))
+        cost += np.sum(np.logaddexp(0, -self.y * tmp_val)) * (1 - momentum)
 
         tmp_val_private = self.x_private.dot(self.theta)
-        cost += np.sum(np.logaddexp(0, -self.y_private * tmp_val_private))
-        # cost += np.sum(np.log(1 + np.exp(-self.y_private * tmp_val_private)))
+        cost += np.sum(np.logaddexp(0, -self.y_private * tmp_val_private)) * momentum
 
         cost /= self.norm_constant
 

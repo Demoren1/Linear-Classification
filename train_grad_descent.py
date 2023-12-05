@@ -1,7 +1,6 @@
 import numpy as np
 import shutil
 import os
-
 import gradient_descent
 import config as cfg
 
@@ -9,16 +8,16 @@ import config as cfg
 def main():
   clear_results()
 
-  file1 = "datasets/mushrooms2.svm"
-  test_file = "datasets/mushrooms.svm"
+  file1 = "datasets/a9a2.svm"
+  test_file = "datasets/a9a.svm"
 
   result_file = open("tmp_results/results.txt", "w")
-  result_graph_path = "tmp_results/mushrooms2_"
+  result_graph_path = "tmp_results/a9a2_"
 
-  features = 112
-  shift = 2
+  features = 123
+  shift = 0
 
-  iteration = 10000
+  iteration = 100000
   learning_rate_1 = 0.00001
 
   file1_conf = cfg.config(file1, features, shift)

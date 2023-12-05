@@ -102,10 +102,16 @@ class GradientDescent:
             elif actual_class == -1 and pred_class == -1:
                 tn += 1
 
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
-        F_score = 2 * precision * recall / (precision + recall)
+        precision = 0
+        recall = 0
+        F_score = 0
 
+        if tp + fp != 0:
+            precision = tp / (tp + fp)
+        if tp + fn != 0:
+            recall = tp / (tp + fn)
+        if precision + recall != 0:
+            F_score = 2 * precision * recall / (precision + recall)
         return precision, recall, F_score
 
     def get_gradient_norm(self, graph_flag : bool, save_path = "gradient_norm.png"):
